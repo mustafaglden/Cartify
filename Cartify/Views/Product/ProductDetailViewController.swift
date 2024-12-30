@@ -22,7 +22,7 @@ final class ProductDetailViewController: BaseViewController {
     }
     
     private let productImage = UIImageView()
-    private let descriptionLabel = UILabel()
+    private let descriptionTextView = UITextView() // Changed to UITextView
     private let titleLabel = UILabel()
     private let starButton = UIButton()
     
@@ -41,7 +41,7 @@ final class ProductDetailViewController: BaseViewController {
     private func setupView() {
         view.addSubview(productImage)
         view.addSubview(starButton)
-        view.addSubview(descriptionLabel)
+        view.addSubview(descriptionTextView)
         view.addSubview(bottomView)
         view.addSubview(titleLabel)
         
@@ -59,11 +59,13 @@ final class ProductDetailViewController: BaseViewController {
         starButton.addTarget(self, action: #selector(toggleFavorite), for: .touchUpInside)
         starButton.translatesAutoresizingMaskIntoConstraints = false
         
-        descriptionLabel.textAlignment = .left
-        descriptionLabel.numberOfLines = 0
-        descriptionLabel.font = UIFont.systemFont(ofSize: 16)
-        descriptionLabel.textColor = .darkGray
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        descriptionTextView.isEditable = false
+        descriptionTextView.isScrollEnabled = true
+        descriptionTextView.textAlignment = .left
+        descriptionTextView.font = UIFont.systemFont(ofSize: 16)
+        descriptionTextView.textColor = .darkGray
+        descriptionTextView.translatesAutoresizingMaskIntoConstraints = false
+        
         bottomView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
@@ -81,9 +83,10 @@ final class ProductDetailViewController: BaseViewController {
             titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             titleLabel.topAnchor.constraint(equalTo: productImage.bottomAnchor, constant: 16),
             
-            descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            descriptionLabel.bottomAnchor.constraint(equalTo: bottomView.topAnchor, constant: 8),
+            descriptionTextView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
+            descriptionTextView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            descriptionTextView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            descriptionTextView.bottomAnchor.constraint(equalTo: bottomView.topAnchor, constant: -8),
             
             bottomView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             bottomView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -102,7 +105,7 @@ final class ProductDetailViewController: BaseViewController {
             guard let self else { return }
             self.addToCartTapped()
         }
-        descriptionLabel.text = product.description
+        descriptionTextView.text = product.description
     }
     
     private func loadFavoriteStatus() {
@@ -116,28 +119,22 @@ final class ProductDetailViewController: BaseViewController {
     
     private func addToCartTapped() {
         guard let product = currentProduct else { return }
-        
         if CoreDataManager.shared.isProductInCart(productId: product.id) {
             CoreDataManager.shared.incrementProductQuantity(productId: product.id)
-            print("increment by one")
         } else {
             CoreDataManager.shared.saveToCart(product: product, quantity: 1)
-            print("decrement by one")
         }
+        updateBadgeTabBar()
     }
 
     
     @objc private func toggleFavorite() {
         guard let product = currentProduct else { return }
-        
         isFavorite.toggle()
-        
         if isFavorite {
             CoreDataManager.shared.saveFavorite(product: product)
-            print("add to favs")
         } else {
             CoreDataManager.shared.removeFavorite(productId: product.id)
-            print("remove from favs")
         }
     }
 }

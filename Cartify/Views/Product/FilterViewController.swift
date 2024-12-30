@@ -61,9 +61,15 @@ final class FilterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Filter"
-//        navigationController?.navigationItem.leftBarButtonItem?
         view.backgroundColor = .white
+        
+        let dismissButton = UIBarButtonItem(image: UIImage(named: "xmark"), style: .plain, target: self, action: #selector(dismissTapped))
+        navigationItem.leftBarButtonItem = dismissButton
         setupTableViewAndButton()
+    }
+    
+    @objc private func dismissTapped() {
+        self.dismiss(animated: true)
     }
 
     private func setupTableViewAndButton() {

@@ -8,8 +8,7 @@
 import UIKit
 
 final class ShoppingCartViewController: BaseViewController {
-    
-    private var cartProducts: [CoreDataCartProduct] = []
+    private(set) var cartProducts: [CoreDataCartProduct] = []
     private let tableView = UITableView()
     private let bottomView = PriceAndButtonBottomView()
     
@@ -56,7 +55,6 @@ final class ShoppingCartViewController: BaseViewController {
             print("Complete purchase.")
         }
     }
-    
     
     private func calculateTotalPrice() -> Double {
         return cartProducts.reduce(0) { total, product in
@@ -107,6 +105,10 @@ extension ShoppingCartViewController: CartCellViewDelegate {
             forCartVC: true
         ) {
             print("Complete purchase")
+        }
+        
+        if let tabBarController = self.tabBarController as? MainTabBarController {
+            tabBarController.updateTabBarBadge()
         }
     }
 }

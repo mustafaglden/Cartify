@@ -13,8 +13,8 @@ final class ProductListViewModel {
     var onProductsFetched: (() -> Void)?
     var onError: ((String) -> Void)?
     
-    private(set) var products: [ProductElement] = [] // All products
-    private(set) var filteredProducts: [ProductElement] = [] // Filtered products
+    private(set) var products: [ProductElement] = []
+    private(set) var filteredProducts: [ProductElement] = []
     private var isFetching = false
     
     func fetchProducts() {
@@ -37,17 +37,6 @@ final class ProductListViewModel {
             }
         }
     }
-    
-//    func searchProducts(by name: String) {
-//        guard !name.isEmpty else {
-//            filteredProducts = products
-//            onProductsFetched?()
-//            return
-//        }
-//        
-//        filteredProducts = products.filter { $0.name.lowercased().contains(name.lowercased()) }
-//        onProductsFetched?()
-//    }
     
     func searchProducts(by name: String) {
         if name.isEmpty {

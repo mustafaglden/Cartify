@@ -11,6 +11,7 @@ class BaseViewController: UIViewController {
     let navTitleLabel = UILabel()
     let titleView = UIView()
     
+    
     var titleLabelText: String = "" {
         didSet {
             updateCustomTitleView()
@@ -19,7 +20,6 @@ class BaseViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // This will change the navigation bar background color
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor(named: "blueColor")
@@ -36,20 +36,16 @@ class BaseViewController: UIViewController {
     }
 
     private func setupCustomTitleView() {
-        // Configure the titleView
         titleView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Configure the label
         navTitleLabel.text = titleLabelText
         navTitleLabel.font = UIFont.boldSystemFont(ofSize: 18)
         navTitleLabel.textColor = .white
         navTitleLabel.textAlignment = .left
         navTitleLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        // Add label to the titleView
         titleView.addSubview(navTitleLabel)
 
-        // Set up constraints for navTitleLabel within titleView
         NSLayoutConstraint.activate([
             navTitleLabel.leadingAnchor.constraint(equalTo: titleView.leadingAnchor),
             navTitleLabel.trailingAnchor.constraint(equalTo: titleView.trailingAnchor),
@@ -57,11 +53,16 @@ class BaseViewController: UIViewController {
             navTitleLabel.bottomAnchor.constraint(equalTo: titleView.bottomAnchor)
         ])
         
-        // Assign the titleView as the custom title view
         navigationItem.titleView = titleView
     }
     
     private func updateCustomTitleView() {
         navTitleLabel.text = titleLabelText
+    }
+    
+    func updateBadgeTabBar() {
+        if let tabBarController = self.tabBarController as? MainTabBarController {
+            tabBarController.updateTabBarBadge()
+        }
     }
 }

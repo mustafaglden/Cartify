@@ -60,6 +60,8 @@ final class ProductCellView: UICollectionViewCell {
         return button
     }()
     
+    var actionButton: (() -> Void)?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -83,6 +85,7 @@ final class ProductCellView: UICollectionViewCell {
         contentView.addSubview(priceLabel)
         contentView.addSubview(addToCartButton)
         contentView.clipsToBounds = false
+        addToCartButton.addTarget(self, action: #selector(addToCartButtonTapped), for: .touchUpInside)
     }
     
     // MARK: - Constraints
@@ -113,13 +116,19 @@ final class ProductCellView: UICollectionViewCell {
             addToCartButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -8)
         ])
     }
-
+    
+    @objc private func addToCartButtonTapped() {
+        actionButton?()
+        print("collectionViewCellButtonTapped..")
+    }
     
     // MARK: - Configure Cell
-    func configure(with image: URL, title: String, price: String, showStar: Bool = false) {
+    func configure(with image: URL, title: String, price: String, showStar: Bool = false, actionButton: @escaping () -> Void) {
         imageView.loadImage(from: image)
         priceLabel.text = price + " ₺"
         starImageView.tintColor = showStar ? UIColor(named: "yellowColor") : UIColor(named: "grayColor")
         titleLabel.text = title
+        
+        self.actionButton = actionButton
     }
 }

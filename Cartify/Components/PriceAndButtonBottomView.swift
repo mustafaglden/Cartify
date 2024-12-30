@@ -7,7 +7,7 @@
 
 import UIKit
 
-class PriceAndButtonBottomView: UIView {
+final class PriceAndButtonBottomView: UIView {
     private let priceLabel: UILabel = {
         let label = UILabel()
         label.textColor = UIColor(named: "blueColor")
@@ -60,10 +60,7 @@ class PriceAndButtonBottomView: UIView {
             hstackContainer.topAnchor.constraint(equalTo: topAnchor, constant: 8),
             hstackContainer.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             hstackContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            hstackContainer.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
-            
-            bottomButton.heightAnchor.constraint(equalToConstant: 38),
-            bottomButton.widthAnchor.constraint(equalToConstant: 182)
+            hstackContainer.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8)
         ])
         
         bottomButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)

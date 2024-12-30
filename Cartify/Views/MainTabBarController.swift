@@ -27,5 +27,15 @@ final class MainTabBarController: UITabBarController {
         profileVC.tabBarItem = UITabBarItem(title: "", image: UIImage(systemName: "person"), tag: 3)
         
         viewControllers = [productlistVC, cartVC, favoriteVC, profileVC]
+        updateTabBarBadge()
+    }
+    
+    func updateTabBarBadge() {
+        let cartCount = CoreDataManager.shared.getCartItemCount()
+        if cartCount > 0 {
+            tabBar.items?[1].badgeValue = "\(cartCount)"
+        } else {
+            tabBar.items?[1].badgeValue = nil
+        }
     }
 }

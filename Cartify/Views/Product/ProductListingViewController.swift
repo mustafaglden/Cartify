@@ -37,7 +37,7 @@ final class ProductListingViewController: BaseViewController {
     private let filterStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 8
+//        stackView.spacing = 8
         stackView.alignment = .center
         stackView.distribution = .fillProportionally
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -167,13 +167,26 @@ final class ProductListingViewController: BaseViewController {
     }
     
     @objc private func didTapFilterButton() {
+        //Couldn't fix it yet.
         let filterVC = FilterViewController(viewModel: viewModel)
-        filterVC.modalPresentationStyle = .fullScreen
+        filterVC.modalPresentationStyle = .pageSheet
         filterVC.delegate = self
-        present(filterVC, animated: true, completion: nil)
+        let navigationController = UINavigationController(rootViewController: filterVC)
+        navigationController.modalPresentationStyle = .overFullScreen
+        present(navigationController, animated: true, completion: nil)
+    }
+    
+    private func addToCartTappedCollectionView(product: ProductElement) {
+        if CoreDataManager.shared.isProductInCart(productId: product.id) {
+            CoreDataManager.shared.incrementProductQuantity(productId: product.id)
+        } else {
+            CoreDataManager.shared.saveToCart(product: product, quantity: 1)
+        }
+        updateBadgeTabBar()
     }
 }
 
+//MARK: - Extensions
 extension ProductListingViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.filteredProducts.count
@@ -186,7 +199,11 @@ extension ProductListingViewController: UICollectionViewDelegateFlowLayout, UICo
         let product = viewModel.filteredProducts[indexPath.row]
         if let imageUrl = URL(string: product.image) {
             let isFav = CoreDataManager.shared.isFavorite(productId: product.id)
-            cell.configure(with: imageUrl, title: product.name, price: product.price, showStar: isFav)
+            cell.configure(with: imageUrl, title: product.name, price: product.price, showStar: isFav) {
+                [weak self] in
+                guard let self else { return }
+                self.addToCartTappedCollectionView(product: product)
+            }
         }
         cell.layer.cornerRadius = 10
         cell.layer.masksToBounds = true
@@ -208,7 +225,6 @@ extension ProductListingViewController: UICollectionViewDelegateFlowLayout, UICo
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 10
     }
-        
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let detailVC = ProductDetailViewController()

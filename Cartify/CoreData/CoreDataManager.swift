@@ -131,14 +131,20 @@ final class CoreDataManager {
         }
     }
     
-//    func delete(_ product: CoreDataCartProduct) {
-//        let context = persistentContainer.viewContext
-//        context.delete(product)
-//        saveContext()
-//    }
-    
     func delete(_ product: CoreDataCartProduct) {
         context.delete(product)
-        saveContext() // Don't forget to save the context
+        saveContext()
+    }
+    
+    func getCartItemCount() -> Int {
+        let context = persistentContainer.viewContext
+        let fetchRequest: NSFetchRequest<CoreDataCartProduct> = CoreDataCartProduct.fetchRequest()
+        
+        do {
+            return try context.fetch(fetchRequest).count
+        } catch {
+            print("Failed to fetch all cart products: \(error)")
+            return 0
+        }
     }
 }
