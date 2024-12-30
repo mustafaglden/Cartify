@@ -19,19 +19,31 @@ class BaseViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        // This will change the navigation bar background color
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(named: "blueColor")
+        
+        let backImage = UIImage(systemName: "arrow.backward")
+        appearance.setBackIndicatorImage(backImage, transitionMaskImage: backImage)
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.tintColor = .white
+        navigationItem.backButtonTitle = ""
         setupCustomTitleView()
     }
 
     private func setupCustomTitleView() {
         // Configure the titleView
-        titleView.backgroundColor = .clear
         titleView.translatesAutoresizingMaskIntoConstraints = false
         
         // Configure the label
         navTitleLabel.text = titleLabelText
         navTitleLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        navTitleLabel.textColor = .black
-        navTitleLabel.textAlignment = .center
+        navTitleLabel.textColor = .white
+        navTitleLabel.textAlignment = .left
         navTitleLabel.translatesAutoresizingMaskIntoConstraints = false
 
         // Add label to the titleView

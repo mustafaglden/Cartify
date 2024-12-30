@@ -92,16 +92,17 @@ final class CartCellView: UITableViewCell {
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: decrementButton.leadingAnchor, constant: -16),
             titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            
+
             decrementButton.trailingAnchor.constraint(equalTo: quantityLabel.leadingAnchor, constant: -8),
             decrementButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             decrementButton.widthAnchor.constraint(equalToConstant: 40),
             decrementButton.heightAnchor.constraint(equalToConstant: 40),
-            
+
+            quantityLabel.trailingAnchor.constraint(equalTo: incrementButton.leadingAnchor, constant: -8),
             quantityLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             quantityLabel.widthAnchor.constraint(equalToConstant: 40),
-            
-            incrementButton.leadingAnchor.constraint(equalTo: quantityLabel.trailingAnchor, constant: 8),
+
+            incrementButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             incrementButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             incrementButton.widthAnchor.constraint(equalToConstant: 40),
             incrementButton.heightAnchor.constraint(equalToConstant: 40),
@@ -125,7 +126,7 @@ final class CartCellView: UITableViewCell {
     
     @objc private func decrementQuantity() {
         guard let productId = productId else { return }
-        if quantity > 1 {
+        if quantity > 0 {
             quantity -= 1
             print("decremented")
             delegate?.didUpdateQuantity(for: productId, newQuantity: quantity)

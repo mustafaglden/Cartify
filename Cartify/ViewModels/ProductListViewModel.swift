@@ -38,14 +38,23 @@ final class ProductListViewModel {
         }
     }
     
+//    func searchProducts(by name: String) {
+//        guard !name.isEmpty else {
+//            filteredProducts = products
+//            onProductsFetched?()
+//            return
+//        }
+//        
+//        filteredProducts = products.filter { $0.name.lowercased().contains(name.lowercased()) }
+//        onProductsFetched?()
+//    }
+    
     func searchProducts(by name: String) {
-        guard !name.isEmpty else {
+        if name.isEmpty {
             filteredProducts = products
-            onProductsFetched?()
-            return
+        } else {
+            filteredProducts = products.filter { $0.name.localizedCaseInsensitiveContains(name) }
         }
-        
-        filteredProducts = products.filter { $0.name.lowercased().contains(name.lowercased()) }
         onProductsFetched?()
     }
     
@@ -62,19 +71,22 @@ final class ProductListViewModel {
                 filteredProducts.sort { $0.price > $1.price }
             case "Price Low to High":
                 filteredProducts.sort { $0.price < $1.price }
-            default: break
+            default:
+                break
             }
         }
-
         if let brands = filters["brands"] as? [String], !brands.isEmpty {
             filteredProducts = filteredProducts.filter { brands.contains($0.brand) }
         }
-
         if let models = filters["models"] as? [String], !models.isEmpty {
             filteredProducts = filteredProducts.filter { models.contains($0.model) }
         }
+        if filters.isEmpty {
+            filteredProducts = products
+        }
         onProductsFetched?()
     }
+    
     private func errorMessage(for error: NetworkError) -> String {
         switch error {
         case .invalidURL: return "Invalid URL"

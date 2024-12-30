@@ -130,4 +130,15 @@ final class CoreDataManager {
             print("Error incrementing product quantity: \(error)")
         }
     }
+    
+//    func delete(_ product: CoreDataCartProduct) {
+//        let context = persistentContainer.viewContext
+//        context.delete(product)
+//        saveContext()
+//    }
+    
+    func delete(_ product: CoreDataCartProduct) {
+        context.delete(product)
+        saveContext() // Don't forget to save the context
+    }
 }

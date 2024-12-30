@@ -20,24 +20,13 @@ final class ProductDetailViewController: BaseViewController {
             updateUI()
         }
     }
-        
-    private var addToCartButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.layer.cornerRadius = 8
-        button.backgroundColor = .systemBlue
-        button.tintColor = .white
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        button.setTitle("Add to Cart", for: .normal)
-        button.addTarget(self, action: #selector(addToCartTapped), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
     
     private let productImage = UIImageView()
     private let descriptionLabel = UILabel()
-    private let priceLabel = UILabel()
     private let titleLabel = UILabel()
     private let starButton = UIButton()
+    
+    private let bottomView = PriceAndButtonBottomView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,9 +42,8 @@ final class ProductDetailViewController: BaseViewController {
         view.addSubview(productImage)
         view.addSubview(starButton)
         view.addSubview(descriptionLabel)
-        view.addSubview(priceLabel)
+        view.addSubview(bottomView)
         view.addSubview(titleLabel)
-        view.addSubview(addToCartButton)
         
         productImage.contentMode = .scaleToFill
         productImage.clipsToBounds = true
@@ -66,13 +54,8 @@ final class ProductDetailViewController: BaseViewController {
         titleLabel.textColor = .black
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        priceLabel.textAlignment = .left
-        priceLabel.textColor = .black
-        priceLabel.font = UIFont.systemFont(ofSize: 18)
-        priceLabel.translatesAutoresizingMaskIntoConstraints = false
-        
         starButton.setImage(UIImage(systemName: "star.fill"), for: .normal)
-        starButton.tintColor = .systemGray
+        starButton.tintColor = UIColor(named: "grayColor")
         starButton.addTarget(self, action: #selector(toggleFavorite), for: .touchUpInside)
         starButton.translatesAutoresizingMaskIntoConstraints = false
         
@@ -81,6 +64,7 @@ final class ProductDetailViewController: BaseViewController {
         descriptionLabel.font = UIFont.systemFont(ofSize: 16)
         descriptionLabel.textColor = .darkGray
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        bottomView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             productImage.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
@@ -97,17 +81,14 @@ final class ProductDetailViewController: BaseViewController {
             titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             titleLabel.topAnchor.constraint(equalTo: productImage.bottomAnchor, constant: 16),
             
-            priceLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            priceLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
-            
             descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            descriptionLabel.topAnchor.constraint(equalTo: priceLabel.bottomAnchor, constant: 8),
+            descriptionLabel.bottomAnchor.constraint(equalTo: bottomView.topAnchor, constant: 8),
             
-            addToCartButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            addToCartButton.heightAnchor.constraint(equalToConstant: 38),
-            addToCartButton.widthAnchor.constraint(equalToConstant: 182),
-            addToCartButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            bottomView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            bottomView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bottomView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            bottomView.heightAnchor.constraint(equalToConstant: 80)
         ])
     }
     
@@ -117,7 +98,10 @@ final class ProductDetailViewController: BaseViewController {
             productImage.loadImage(from: imageUrl)
         }
         titleLabel.text = product.name
-        priceLabel.text = "$\(product.price)"
+        bottomView.configure(buttonText: "Add to Cart", priceText: product.price) { [weak self] in
+            guard let self else { return }
+            self.addToCartTapped()
+        }
         descriptionLabel.text = product.description
     }
     
@@ -127,8 +111,21 @@ final class ProductDetailViewController: BaseViewController {
     }
     
     private func updateStarButtonAppearance() {
-        starButton.tintColor = isFavorite ? .systemOrange : .systemGray
+        starButton.tintColor = isFavorite ? UIColor(named: "yellowColor"): UIColor(named: "grayColor")
     }
+    
+    private func addToCartTapped() {
+        guard let product = currentProduct else { return }
+        
+        if CoreDataManager.shared.isProductInCart(productId: product.id) {
+            CoreDataManager.shared.incrementProductQuantity(productId: product.id)
+            print("increment by one")
+        } else {
+            CoreDataManager.shared.saveToCart(product: product, quantity: 1)
+            print("decrement by one")
+        }
+    }
+
     
     @objc private func toggleFavorite() {
         guard let product = currentProduct else { return }
@@ -143,18 +140,4 @@ final class ProductDetailViewController: BaseViewController {
             print("remove from favs")
         }
     }
-    
-    @objc private func addToCartTapped() {
-        guard let product = currentProduct else { return }
-        
-        if CoreDataManager.shared.isProductInCart(productId: product.id) {
-            CoreDataManager.shared.incrementProductQuantity(productId: product.id)
-            print("1 unit of \(product.name) added to existing cart item.")
-        } else {
-            CoreDataManager.shared.saveToCart(product: product, quantity: 1)
-            print("\(product.name) added to cart with quantity 1.")
-        }
-    }
-    
-
 }

@@ -12,7 +12,7 @@ final class MainTabBarController: UITabBarController {
         super.viewDidLoad()
         tabBar.backgroundColor = .white
         tabBar.unselectedItemTintColor = .black
-        tabBar.tintColor = .systemBlue
+        tabBar.tintColor = UIColor(named: "blueColor")
         
         let productlistVC = UINavigationController(rootViewController: ProductListingViewController())
         productlistVC.tabBarItem = UITabBarItem(title: "", image: UIImage(systemName: "house"), tag: 0)

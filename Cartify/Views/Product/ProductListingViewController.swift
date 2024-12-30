@@ -16,19 +16,35 @@ final class ProductListingViewController: BaseViewController {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
-    
     private let filterButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Filter", for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 14)
-        button.backgroundColor = .systemGray
+        button.backgroundColor = UIColor(named: "grayColor")
         button.setTitleColor(.black, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-
-    private let spinnerView = SpinnerView()
+    private let appliedFiltersLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 12)
+        label.textColor = .gray
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    private let filterStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 8
+        stackView.alignment = .center
+        stackView.distribution = .fillProportionally
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
     
+    private let spinnerView = SpinnerView()
     private var searchBar = UISearchBar()
     private let searchBarContainer = UIView()
     
@@ -43,7 +59,6 @@ final class ProductListingViewController: BaseViewController {
         setupSearchBar()
         setupCollectionView()
         setupBindings()
-        setupFilterButton()
         viewModel.fetchProducts()
     }
     
@@ -55,33 +70,60 @@ final class ProductListingViewController: BaseViewController {
     private func setupSearchBar() {
         searchBar.delegate = self
         searchBar.placeholder = "Search"
+        
         searchBarContainer.translatesAutoresizingMaskIntoConstraints = false
         searchBarContainer.backgroundColor = .white
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBarContainer.addSubview(searchBar)
-            
+        
         view.addSubview(searchBarContainer)
-        view.addSubview(filterButton)
+        
+        // Set explicit properties for the label and button
+        appliedFiltersLabel.text = "No Filters Applied"
+        appliedFiltersLabel.font = UIFont.systemFont(ofSize: 14)
+        appliedFiltersLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        
+        filterButton.setTitle("Select Filter", for: .normal)
+        filterButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
+        filterButton.backgroundColor = UIColor(named: "grayColor")
+        filterButton.setTitleColor(.black, for: .normal)
+        filterButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        filterButton.widthAnchor.constraint(equalToConstant: 80).isActive = true
+        filterButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
 
+        filterStackView.addArrangedSubview(appliedFiltersLabel)
+        filterStackView.addArrangedSubview(filterButton)
+        
+        view.addSubview(filterStackView)
+        view.addSubview(collectionView)
+        
         NSLayoutConstraint.activate([
             searchBarContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             searchBarContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             searchBarContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             searchBarContainer.heightAnchor.constraint(equalToConstant: 40),
-        
+            
             searchBar.topAnchor.constraint(equalTo: searchBarContainer.topAnchor),
             searchBar.leadingAnchor.constraint(equalTo: searchBarContainer.leadingAnchor),
             searchBar.trailingAnchor.constraint(equalTo: searchBarContainer.trailingAnchor),
             searchBar.bottomAnchor.constraint(equalTo: searchBarContainer.bottomAnchor),
             
-            filterButton.topAnchor.constraint(equalTo: searchBarContainer.bottomAnchor, constant: 8),
-            filterButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            filterButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            filterButton.heightAnchor.constraint(equalToConstant: 40)
+            filterButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.4),
+            filterButton.heightAnchor.constraint(equalToConstant: 36),
+            
+            filterStackView.topAnchor.constraint(equalTo: searchBarContainer.bottomAnchor, constant: 8),
+            filterStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            filterStackView.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -16),
+            
+            collectionView.topAnchor.constraint(equalTo: filterStackView.bottomAnchor, constant: 8),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8)
         ])
         
         filterButton.addTarget(self, action: #selector(didTapFilterButton), for: .touchUpInside)
     }
+
 
     
     private func setupCollectionView() {
@@ -93,16 +135,11 @@ final class ProductListingViewController: BaseViewController {
         view.addSubview(collectionView)
         
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: searchBarContainer.bottomAnchor, constant: 8),
+            collectionView.topAnchor.constraint(equalTo: filterStackView.bottomAnchor, constant: 16),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8)
         ])
-    }
-    
-    private func setupFilterButton() {
-        let filterButton = UIBarButtonItem(title: "Filter", style: .plain, target: self, action: #selector(didTapFilterButton))
-        navigationItem.rightBarButtonItem = filterButton
     }
     
     private func setupBindings() {
@@ -131,7 +168,7 @@ final class ProductListingViewController: BaseViewController {
     
     @objc private func didTapFilterButton() {
         let filterVC = FilterViewController(viewModel: viewModel)
-        filterVC.modalPresentationStyle = .formSheet
+        filterVC.modalPresentationStyle = .fullScreen
         filterVC.delegate = self
         present(filterVC, animated: true, completion: nil)
     }
@@ -139,20 +176,17 @@ final class ProductListingViewController: BaseViewController {
 
 extension ProductListingViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.products.count
+        return viewModel.filteredProducts.count
     }
-        
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ProductCellView", for: indexPath) as? ProductCellView else {
             return UICollectionViewCell()
         }
-        if let imageUrl = URL(string: viewModel.products[indexPath.row].image) {
-            let isFav = CoreDataManager.shared.isFavorite(productId: viewModel.products[indexPath.row].id)
-            // debug
-            if indexPath.row == 1 {
-                cell.configure(with: imageUrl, title: viewModel.products[indexPath.row].name, price: viewModel.products[indexPath.row].price, showStar: isFav)
-            }
-            cell.configure(with: imageUrl, title: viewModel.products[indexPath.row].name, price: viewModel.products[indexPath.row].price, showStar: isFav)
+        let product = viewModel.filteredProducts[indexPath.row]
+        if let imageUrl = URL(string: product.image) {
+            let isFav = CoreDataManager.shared.isFavorite(productId: product.id)
+            cell.configure(with: imageUrl, title: product.name, price: product.price, showStar: isFav)
         }
         cell.layer.cornerRadius = 10
         cell.layer.masksToBounds = true
@@ -160,7 +194,7 @@ extension ProductListingViewController: UICollectionViewDelegateFlowLayout, UICo
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = (collectionView.frame.width / 2) - 16
-        return CGSize(width: width, height: 200)
+        return CGSize(width: width, height: 300)
     }
         
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -194,5 +228,17 @@ extension ProductListingViewController: FilterViewControllerDelegate {
         print("Applied filters: \(filters)")
         viewModel.applyFilters(filters)
         collectionView.reloadData()
+        
+        var filterSummary = "Applied Filters: "
+        if let brands = filters["brands"] as? [String], !brands.isEmpty {
+            filterSummary += "Brands: \(brands.joined(separator: ", ")) "
+        }
+        if let models = filters["models"] as? [String], !models.isEmpty {
+            filterSummary += "Models: \(models.joined(separator: ", ")) "
+        }
+        if let sorting = filters["sorting"] as? String {
+            filterSummary += "Sorting: \(sorting) "
+        }
+        appliedFiltersLabel.text = filterSummary.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

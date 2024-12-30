@@ -42,7 +42,7 @@ final class ProductCellView: UICollectionViewCell {
     private let priceLabel: UILabel = {
         let label = UILabel()
         label.text = "price"
-        label.textColor = .systemBlue
+        label.textColor = UIColor(named: "blueColor")
         label.textAlignment = .left
         label.font = UIFont.systemFont(ofSize: 14)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -52,7 +52,7 @@ final class ProductCellView: UICollectionViewCell {
     private let addToCartButton: UIButton = {
         let button = UIButton(type: .system)
         button.layer.cornerRadius = 8
-        button.backgroundColor = .systemBlue
+        button.backgroundColor = UIColor(named: "blueColor")
         button.tintColor = .white
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         button.setTitle("Add to Cart", for: .normal)
@@ -82,43 +82,44 @@ final class ProductCellView: UICollectionViewCell {
         contentView.addSubview(titleLabel)
         contentView.addSubview(priceLabel)
         contentView.addSubview(addToCartButton)
+        contentView.clipsToBounds = false
     }
     
     // MARK: - Constraints
     private func setupConstraints() {
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
-            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            imageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            imageView.widthAnchor.constraint(equalToConstant: 150),
             imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor),
             
-            starImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            starImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+            starImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 14),
+            starImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
             starImageView.widthAnchor.constraint(equalToConstant: 24),
             starImageView.heightAnchor.constraint(equalToConstant: 24),
             
-            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
-            titleLabel.heightAnchor.constraint(equalToConstant: 18),
+            priceLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 8),
+            priceLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            priceLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
             
-            priceLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            priceLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            priceLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
-            priceLabel.heightAnchor.constraint(equalToConstant: 18),
+            titleLabel.topAnchor.constraint(equalTo: priceLabel.bottomAnchor, constant: 4),
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
             
-            addToCartButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
-            addToCartButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-            addToCartButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
-            addToCartButton.topAnchor.constraint(equalTo: priceLabel.bottomAnchor, constant: 10)
+            addToCartButton.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
+            addToCartButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            addToCartButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+            addToCartButton.heightAnchor.constraint(equalToConstant: 40),
+            addToCartButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -8)
         ])
     }
+
     
     // MARK: - Configure Cell
     func configure(with image: URL, title: String, price: String, showStar: Bool = false) {
         imageView.loadImage(from: image)
-        priceLabel.text = price
-        starImageView.tintColor = showStar ? .systemOrange : .systemGray
+        priceLabel.text = price + " ₺"
+        starImageView.tintColor = showStar ? UIColor(named: "yellowColor") : UIColor(named: "grayColor")
         titleLabel.text = title
     }
 }
