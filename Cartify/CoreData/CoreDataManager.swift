@@ -68,6 +68,18 @@ final class CoreDataManager {
         }
     }
     
+    func fetchAllFavorites() -> [CoreDataProduct] {
+        let context = persistentContainer.viewContext
+        let fetchRequest: NSFetchRequest<CoreDataProduct> = CoreDataProduct.fetchRequest()
+        
+        do {
+            return try context.fetch(fetchRequest)
+        } catch {
+            print("Failed to fetch all cart products: \(error)")
+            return []
+        }
+    }
+    
     func isFavorite(productId: String) -> Bool {
         let context = CoreDataManager.shared.context
         let fetchRequest: NSFetchRequest<CoreDataProduct> = CoreDataProduct.fetchRequest()
